@@ -21,6 +21,7 @@ const processNotices = async (responseGetNoticesFromJW) => {
 
      $('div.NewsArticlePage').each((i, element) => {
 
+          // TODO: refatorar os primeiros links que estão vindo com titulo undefined. 
           const title = $(element).find('a.subtle').attr('title');
           const link = $(element).find('a').attr('href');
           let concatLink = `https://jw.org${link}`;
