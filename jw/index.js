@@ -13,15 +13,14 @@ const getNoticesFromJW = async () => {
      return response
 }
 
-
-const processNotices = async (responseGetNoticesFromJW) => {
+const processAllNotices = async (responseGetNoticesFromJW) => {
 
      const $ = cheerio.load(responseGetNoticesFromJW.data);
-     const articlesFromJW = [];
+     let articlesFromJW = [];
 
+     // encontrar um meio para remover a noticia que está em destaque. Ela é tratada na função processHighlightedNotice.
      $('div.NewsArticlePage').each((i, element) => {
 
-          // TODO: refatorar os primeiros links que estão vindo com titulo undefined. 
           const title = $(element).find('a.subtle').attr('title');
           const link = $(element).find('a').attr('href');
           let concatLink = `https://jw.org${link}`;
@@ -35,25 +34,61 @@ const processNotices = async (responseGetNoticesFromJW) => {
      return ({ articlesFromJW })
 };
 
-const treatProcessedNotices = async (responseProcessNotices) => {
-     console.log(responseProcessNotices)
 
+const processHighlightedNotice = async (responseGetNoticesFromJW) => {
+     const $ = cheerio.load(responseGetNoticesFromJW.data);
+     let articlesFromJW = [];
 
+     $('div.presentationIntent-desktop').each((i, element) => {
 
+          // TODO: encontrar um método para melhorar a apresentação do titulo aqui. 
+          const title = $(element).find('a').text();
+          
+          const link = $(element).find('a').attr('href');
+          let concatLink = `https://jw.org${link}`;
+
+          articlesFromJW.push({
+               title: title,
+               link: concatLink
+          });
+     });
+
+     return ({ articlesFromJW })
 }
+
+
+
+
+
+// const treatProcessedNotices = async (responseProcessNotices) => {
+//      console.log(responseProcessNotices)
+
+
+
+// }
 
 
 
 const main = async () => {
 
      const responseGetNoticesFromJW = await getNoticesFromJW();
-     const responseProcessNotices = await processNotices(responseGetNoticesFromJW);
-     const responseTreatProcessedNotices = await treatProcessedNotices(responseProcessNotices);
 
-     //console.log(responseTreatProcessNotices)
+
+     const responseProcessAllNotices = await processAllNotices(responseGetNoticesFromJW);
+     console.log(responseProcessAllNotices)
+
+     const responseProcessHighlightedNotice = await processHighlightedNotice(responseGetNoticesFromJW)
+     console.log(responseProcessHighlightedNotice)
+
+     //const responseTreatProcessedNotices = await treatProcessedNotices(responseProcessNotices);
 
 };
 
 
 main()
 
+
+
+/**
+ *  // TODO: Tratar o nome do array articlesFromJW para cada função. No futuro quando refatorar e for adicionando os objetos, eles não podem ter o mesmo nome.
+ */
