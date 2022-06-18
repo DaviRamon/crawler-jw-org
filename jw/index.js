@@ -41,9 +41,7 @@ const processHighlightedNotice = async (responseGetNoticesFromJW) => {
 
      $('div.presentationIntent-desktop').each((i, element) => {
 
-          // TODO: encontrar um método para melhorar a apresentação do titulo aqui. 
-          const title = $(element).find('a').text();
-          
+          const title = $(element).find('em').text();
           const link = $(element).find('a').attr('href');
           let concatLink = `https://jw.org${link}`;
 
@@ -75,7 +73,7 @@ const main = async () => {
 
 
      const responseProcessAllNotices = await processAllNotices(responseGetNoticesFromJW);
-     console.log(responseProcessAllNotices)
+     //console.log(responseProcessAllNotices)
 
      const responseProcessHighlightedNotice = await processHighlightedNotice(responseGetNoticesFromJW)
      console.log(responseProcessHighlightedNotice)
