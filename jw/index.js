@@ -5,7 +5,6 @@ const cheerio = require('cheerio');
 const getNoticesFromJW = async () => {
 
      const url = 'https://www.jw.org/pt/noticias/noticias-testemunhas-jeova/';
-
      let response = await axios.get(url)
           .then(function (result) { return result })
           .catch(error => console.log(error))
@@ -13,13 +12,13 @@ const getNoticesFromJW = async () => {
      return response
 }
 
-const processAllNotices = async (responseGetNoticesFromJW) => {
+
+const processNotices = async (responseGetNoticesFromJW) => {
 
      const $ = cheerio.load(responseGetNoticesFromJW.data);
      let articlesFromJW = [];
 
-     // encontrar um meio para remover a noticia que está em destaque. Ela é tratada na função processHighlightedNotice.
-     $('div.NewsArticlePage').each((i, element) => {
+     $('p.contextTitle').each((i, element) => {
 
           const title = $(element).find('a.subtle').attr('title');
           const link = $(element).find('a').attr('href');
@@ -31,13 +30,14 @@ const processAllNotices = async (responseGetNoticesFromJW) => {
           });
      });
 
-     return ({ articlesFromJW })
+     return articlesFromJW;
 };
 
 
 const processHighlightedNotice = async (responseGetNoticesFromJW) => {
+
      const $ = cheerio.load(responseGetNoticesFromJW.data);
-     let articlesFromJW = [];
+     let highlightedArticlesFromJW = [];
 
      $('div.presentationIntent-desktop').each((i, element) => {
 
@@ -45,48 +45,37 @@ const processHighlightedNotice = async (responseGetNoticesFromJW) => {
           const link = $(element).find('a').attr('href');
           let concatLink = `https://jw.org${link}`;
 
-          articlesFromJW.push({
+          highlightedArticlesFromJW.push({
                title: title,
                link: concatLink
           });
      });
 
-     return ({ articlesFromJW })
+     return highlightedArticlesFromJW;
 }
 
 
+const concatAllProcessedNotices = async (responseProcessHighlightedNotice, responseProcessNotices) => {
 
+     return {
 
-
-// const treatProcessedNotices = async (responseProcessNotices) => {
-//      console.log(responseProcessNotices)
-
-
-
-// }
-
+          highlightedNotice: responseProcessHighlightedNotice,
+          notices: responseProcessNotices
+     }
+}
 
 
 const main = async () => {
 
      const responseGetNoticesFromJW = await getNoticesFromJW();
+     const responseProcessHighlightedNotice = await processHighlightedNotice(responseGetNoticesFromJW);
+     const responseProcessNotices = await processNotices(responseGetNoticesFromJW);
+     const responseConcatAllProcessedNotices = await concatAllProcessedNotices(responseProcessHighlightedNotice, responseProcessNotices);
 
-
-     const responseProcessAllNotices = await processAllNotices(responseGetNoticesFromJW);
-     //console.log(responseProcessAllNotices)
-
-     const responseProcessHighlightedNotice = await processHighlightedNotice(responseGetNoticesFromJW)
-     console.log(responseProcessHighlightedNotice)
-
-     //const responseTreatProcessedNotices = await treatProcessedNotices(responseProcessNotices);
+     console.log(responseConcatAllProcessedNotices)
+     //return responseConcatAllProcessedNotices
 
 };
 
-
 main()
 
-
-
-/**
- *  // TODO: Tratar o nome do array articlesFromJW para cada função. No futuro quando refatorar e for adicionando os objetos, eles não podem ter o mesmo nome.
- */
