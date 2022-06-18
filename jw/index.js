@@ -9,7 +9,7 @@ const getNoticesFromJW = async () => {
           .then(function (result) { return result })
           .catch(error => console.log(error))
 
-     return response
+     return response;
 }
 
 
@@ -58,7 +58,6 @@ const processHighlightedNotice = async (responseGetNoticesFromJW) => {
 const concatAllProcessedNotices = async (responseProcessHighlightedNotice, responseProcessNotices) => {
 
      return {
-
           highlightedNotice: responseProcessHighlightedNotice,
           notices: responseProcessNotices
      }
